@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import json
 import os
+import uuid
 
 
 host = os.environ["DATABRICKS_HOST"]
@@ -15,6 +16,11 @@ st.title("Ticket Chatbot")
 # Sidebar for configuration
 st.sidebar.header("Configuration")
 databricks_token = st.sidebar.text_input("Databricks Token", type="password")
+
+if "thread_id" not in st.session_state:
+    st.session_state.thread_id = str(uuid.uuid4()) 
+
+st.write(f"Generated thread_id: {st.session_state.thread_id}")
 
 # Chat history initialization
 if "messages" not in st.session_state:
@@ -42,7 +48,7 @@ if user_query:
         "messages": [
             "user", user_query
         ],
-        "thread_id": "3"
+        "config":{"thread_id": st.session_state.thread_id}
     }
 
     # Send request to Databricks LangGraph serving endpoint
